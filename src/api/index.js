@@ -15,7 +15,14 @@ app.use("/users", userRouter);
 app.use("/note", noteRouter);
 
 app.get("/", (req, res) => {
-    res.send("Notes API FromCheezyCode");
+    mongoose.connect(process.env.MONGO_URL)
+    .then(() => {
+        console.log("MongoDB connected");
+    })
+    .catch((error) => {
+        console.log(error);
+    });
+    //res.send("Notes API FromCheezyCode");
 });
 
 mongoose.connect(process.env.MONGO_URL)
