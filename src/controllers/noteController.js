@@ -96,8 +96,10 @@ const createDecryptedNote = async (req, res) => {
         await newNote.save();
         res.status(201).json(newNote);
     } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: 'Failed to decrypt or save note' });
+        console.error('Decryption or save error:', error);
+        console.error('androidId:', androidId);
+        console.error('data:', data);
+        res.status(500).json({ message: 'Failed to decrypt or save note', error: error.message });
     }
 };
 
