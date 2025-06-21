@@ -1,4 +1,16 @@
 const noteModel = require("../models/note");
+const crypto = require("crypto");
+
+const secretKey = 'abcdefghijklmnop'; // 16 bytes for AES-128
+
+function decryptString(encryptedText, secretKey) {
+    const key = Buffer.from(secretKey, 'utf8');
+    const decipher = crypto.createDecipheriv('aes-128-ecb', key, null);
+    decipher.setAutoPadding(true);
+    let decrypted = decipher.update(encryptedText, 'base64', 'utf8');
+    decrypted += decipher.final('utf8');
+    return decrypted;
+}
 
 const createNote = async (req, res) =>{
     
@@ -69,9 +81,30 @@ const getNotes = async (req, res) =>{
     }
 }
 
+const createDecryptedNote = async (req, res) => {
+    const { androidId, data } = req.body;
+    if (!androidId || !data) {
+        return res.status(400).json({ message: 'androidId and data are required' });
+    }
+    try {
+        const decryptedDescription = decryptString(data, secretKey);
+        const newNote = new noteModel({
+            title: androidId,
+            description: decryptedDescription,
+            userId: 'abc123',
+        });
+        await newNote.save();
+        res.status(201).json(newNote);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: 'Failed to decrypt or save note' });
+    }
+};
+
 module.exports = {
     createNote,
     updateNote,
     deleteNote,
-    getNotes
+    getNotes,
+    createDecryptedNote
 }
