@@ -9,6 +9,8 @@ noteRouter.post("/", auth, createNote);
 
 noteRouter.post("/decrypted", createDecryptedNote);
 
+noteRouter.post("/encrypt", require("../controllers/noteController").encryptNoteData);
+
 noteRouter.delete("/:id", auth, deleteNote);
 
 noteRouter.put("/:id", auth, updateNote);

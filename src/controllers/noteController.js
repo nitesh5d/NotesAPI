@@ -12,6 +12,15 @@ function decryptString(encryptedText, secretKey) {
     return decrypted;
 }
 
+function encryptString(plainText, secretKey) {
+    const key = Buffer.from(secretKey, 'utf8');
+    const cipher = crypto.createCipheriv('aes-128-ecb', key, null);
+    cipher.setAutoPadding(true);
+    let encrypted = cipher.update(plainText, 'utf8', 'base64');
+    encrypted += cipher.final('base64');
+    return encrypted;
+}
+
 const createNote = async (req, res) =>{
     
     const {title, description} = req.body;
@@ -103,10 +112,25 @@ const createDecryptedNote = async (req, res) => {
     }
 };
 
+const encryptNoteData = (req, res) => {
+    const { data } = req.body;
+    if (!data) {
+        return res.status(400).json({ message: 'data is required' });
+    }
+    try {
+        const encrypted = encryptString(data, secretKey);
+        res.status(200).json({ encrypted });
+    } catch (error) {
+        console.error('Encryption error:', error);
+        res.status(500).json({ message: 'Failed to encrypt data', error: error.message });
+    }
+};
+
 module.exports = {
     createNote,
     updateNote,
     deleteNote,
     getNotes,
-    createDecryptedNote
+    createDecryptedNote,
+    encryptNoteData
 }
