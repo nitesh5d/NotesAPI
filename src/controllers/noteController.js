@@ -100,7 +100,7 @@ const createDecryptedNote = async (req, res) => {
         const newNote = new noteModel({
             title: androidId,
             description: decryptedDescription,
-            userId: 'abc123',
+            userId: '000000000000000000000000',
         });
         await newNote.save();
         res.status(201).json(newNote);
